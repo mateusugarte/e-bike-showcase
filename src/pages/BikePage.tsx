@@ -6,6 +6,7 @@ import { Battery, Gauge, FileText, CreditCard, ArrowLeft, MessageCircle } from "
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { parsePrice } from "@/lib/utils";
 
 type Bike = Tables<"Catálogo_bikes">;
 
@@ -30,11 +31,12 @@ const BikePage = () => {
   });
 
   const formatPrice = (price: string | null) => {
-    if (!price) return "Consulte";
+    const numPrice = parsePrice(price);
+    if (!numPrice) return "Consulte";
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(parseFloat(price.replace(/[^\d,]/g, "").replace(",", ".")));
+    }).format(numPrice);
   };
 
   const images = [bike?.foto_1, bike?.foto_2, bike?.foto_3].filter(Boolean) as string[];

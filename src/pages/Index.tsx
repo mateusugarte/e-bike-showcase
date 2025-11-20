@@ -7,6 +7,7 @@ import { BikeFilters } from "@/components/BikeFilters";
 import { Tables } from "@/integrations/supabase/types";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { parsePrice } from "@/lib/utils";
 
 type Bike = Tables<"Catálogo_bikes">;
 
@@ -32,12 +33,8 @@ const Index = () => {
   const maxPrice = useMemo(() => {
     if (!bikes || bikes.length === 0) return 50000;
     const prices = bikes
-      .map((bike) => {
-        if (!bike.valor) return 0;
-        const cleanPrice = bike.valor.replace(/[^\d,]/g, "").replace(",", ".");
-        return parseFloat(cleanPrice);
-      })
-      .filter((price) => !isNaN(price));
+      .map((bike) => parsePrice(bike.valor))
+      .filter((price) => !isNaN(price) && price > 0);
 
     return prices.length > 0 ? Math.max(...prices) : 50000;
   }, [bikes]);
@@ -50,13 +47,8 @@ const Index = () => {
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      if (!bike.valor) return matchesSearch;
-
-      const cleanPrice = bike.valor.replace(/[^\d,]/g, "").replace(",", ".");
-      const price = parseFloat(cleanPrice);
-
-      const matchesPrice =
-        !isNaN(price) && price >= priceRange[0] && price <= priceRange[1];
+      const price = parsePrice(bike.valor);
+      const matchesPrice = price >= priceRange[0] && price <= priceRange[1];
 
       return matchesSearch && matchesPrice;
     });
