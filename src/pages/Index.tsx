@@ -5,18 +5,18 @@ import { BikeCard } from "@/components/BikeCard";
 import { BikeDetailsDialog } from "@/components/BikeDetailsDialog";
 import { BikeFilters } from "@/components/BikeFilters";
 import { Tables } from "@/integrations/supabase/types";
-import { Battery } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 type Bike = Tables<"Catálogo_bikes">;
 
 const Index = () => {
   const [selectedBike, setSelectedBike] = useState<Bike | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [priceRange, setPriceRange] = useState([0]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
 
-  // Buscar bikes do Supabase
-  const { data: bikes = [], isLoading } = useQuery({
-    queryKey: ["bikes"],
+  const { data: bikes, isLoading } = useQuery({
+    queryKey: ["available-bikes"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("Catálogo_bikes")
@@ -29,56 +29,67 @@ const Index = () => {
     },
   });
 
-  // Calcular preço máximo
   const maxPrice = useMemo(() => {
-    if (bikes.length === 0) return 20000;
-    return Math.max(
-      ...bikes.map((bike) => {
-        const price = bike.valor?.replace(/[^\d,]/g, "").replace(",", ".");
-        return parseFloat(price || "0");
+    if (!bikes || bikes.length === 0) return 50000;
+    const prices = bikes
+      .map((bike) => {
+        if (!bike.valor) return 0;
+        const cleanPrice = bike.valor.replace(/[^\d,]/g, "").replace(",", ".");
+        return parseFloat(cleanPrice);
       })
-    );
+      .filter((price) => !isNaN(price));
+
+    return prices.length > 0 ? Math.max(...prices) : 50000;
   }, [bikes]);
 
-  // Filtrar bikes
   const filteredBikes = useMemo(() => {
+    if (!bikes) return [];
+
     return bikes.filter((bike) => {
       const matchesSearch = bike.modelo
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      const bikePrice = parseFloat(
-        bike.valor?.replace(/[^\d,]/g, "").replace(",", ".") || "0"
-      );
+      if (!bike.valor) return matchesSearch;
+
+      const cleanPrice = bike.valor.replace(/[^\d,]/g, "").replace(",", ".");
+      const price = parseFloat(cleanPrice);
+
       const matchesPrice =
-        priceRange[0] === 0 || bikePrice <= priceRange[0];
+        !isNaN(price) && price >= priceRange[0] && price <= priceRange[1];
 
       return matchesSearch && matchesPrice;
     });
   }, [bikes, searchTerm, priceRange]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <header className="bg-gradient-to-r from-primary to-accent text-primary-foreground py-16 px-4">
-        <div className="container mx-auto max-w-7xl text-center">
-          <div className="flex justify-center mb-6">
-            <Battery className="h-16 w-16" />
+    <div className="min-h-screen bg-gradient-accent">
+      {/* Header with Logo */}
+      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border shadow-card-custom">
+        <div className="container mx-auto px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-center sm:justify-start">
+            <img 
+              src={logo} 
+              alt="Logo" 
+              className="h-12 sm:h-14 md:h-16 w-auto object-contain"
+            />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Catálogo de E-Bikes
-          </h1>
-          <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
-            Encontre a bike elétrica perfeita para você. Modelos modernos,
-            autonomia excepcional e o melhor custo-benefício.
-          </p>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto max-w-7xl px-4 py-12">
-        {/* Filtros */}
-        <div className="mb-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8 md:py-12">
+        {/* Hero Section - Mobile First */}
+        <section className="text-center mb-8 sm:mb-10 md:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-primary bg-clip-text text-transparent">
+            Catálogo de E-Bikes
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
+            Encontre a bike elétrica perfeita para você
+          </p>
+        </section>
+
+        {/* Filters */}
+        <div className="mb-6 sm:mb-8">
           <BikeFilters
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -90,52 +101,40 @@ const Index = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-            <p className="mt-4 text-muted-foreground">Carregando bikes...</p>
+          <div className="flex items-center justify-center py-16 sm:py-20">
+            <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 animate-spin text-primary" />
           </div>
         )}
 
         {/* Empty State */}
         {!isLoading && filteredBikes.length === 0 && (
-          <div className="text-center py-12">
-            <Battery className="h-16 w-16 mx-auto text-muted-foreground/20 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">
+          <div className="text-center py-16 sm:py-20">
+            <p className="text-lg sm:text-xl text-muted-foreground">
               Nenhuma bike encontrada
-            </h3>
-            <p className="text-muted-foreground">
-              Tente ajustar os filtros para ver mais resultados.
             </p>
           </div>
         )}
 
-        {/* Grid de Bikes */}
+        {/* Bikes Grid - Mobile First */}
         {!isLoading && filteredBikes.length > 0 && (
-          <>
-            <div className="mb-6 text-sm text-muted-foreground">
-              Mostrando {filteredBikes.length} de {bikes.length} bikes
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredBikes.map((bike) => (
-                <BikeCard
-                  key={bike.id}
-                  bike={bike}
-                  onClick={() => setSelectedBike(bike)}
-                />
-              ))}
-            </div>
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+            {filteredBikes.map((bike) => (
+              <BikeCard
+                key={bike.id}
+                bike={bike}
+                onClick={() => setSelectedBike(bike)}
+              />
+            ))}
+          </div>
         )}
       </main>
 
-      {/* Dialog de Detalhes */}
-      {selectedBike && (
-        <BikeDetailsDialog
-          bike={selectedBike}
-          open={!!selectedBike}
-          onOpenChange={(open) => !open && setSelectedBike(null)}
-        />
-      )}
+      {/* Details Dialog */}
+      <BikeDetailsDialog
+        bike={selectedBike}
+        open={!!selectedBike}
+        onOpenChange={(open) => !open && setSelectedBike(null)}
+      />
     </div>
   );
 };
