@@ -235,21 +235,6 @@ const BikePage = () => {
                   </p>
                 </div>
               )}
-
-              {/* CTA Button */}
-              <div className="pt-4 space-y-3">
-                <Button
-                  size="lg"
-                  className="w-full h-14 text-lg font-semibold rounded-xl"
-                  onClick={() => window.open(`https://wa.me/`, '_blank')}
-                >
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  Entrar em Contato
-                </Button>
-                <p className="text-sm text-center text-muted-foreground">
-                  Tire suas dúvidas pelo WhatsApp
-                </p>
-              </div>
             </div>
           </div>
         </div>
