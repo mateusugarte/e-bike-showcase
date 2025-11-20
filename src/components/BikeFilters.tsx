@@ -57,29 +57,12 @@ export const BikeFilters = ({
             htmlFor="price-range" 
             className="text-sm sm:text-base font-semibold text-card-foreground flex items-center gap-2"
           >
-            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
+            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Faixa de Preço
           </Label>
           
-          {/* Price Display - Mobile First */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 sm:p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border border-border/50">
-            <div className="text-center sm:text-left">
-              <p className="text-xs text-muted-foreground mb-0.5">Mínimo</p>
-              <p className="text-lg sm:text-xl font-bold text-primary">
-                {formatPrice(priceRange[0])}
-              </p>
-            </div>
-            <div className="hidden sm:block text-muted-foreground">até</div>
-            <div className="text-center sm:text-right">
-              <p className="text-xs text-muted-foreground mb-0.5">Máximo</p>
-              <p className="text-lg sm:text-xl font-bold text-secondary">
-                {formatPrice(priceRange[1])}
-              </p>
-            </div>
-          </div>
-
           {/* Slider - Touch Optimized */}
-          <div className="px-2 pt-2">
+          <div className="px-2 pt-4 pb-2">
             <Slider
               id="price-range"
               min={0}
@@ -91,6 +74,23 @@ export const BikeFilters = ({
               }
               className="touch-manipulation"
             />
+          </div>
+
+          {/* Price Display - Mobile First */}
+          <div className="flex items-center justify-between gap-3 px-2">
+            <div className="flex-1 text-center p-2 bg-primary/10 rounded-lg border border-primary/30">
+              <p className="text-xs text-muted-foreground mb-1">Mínimo</p>
+              <p className="text-base sm:text-lg font-bold text-primary">
+                {formatPrice(priceRange[0])}
+              </p>
+            </div>
+            <div className="text-muted-foreground text-sm">-</div>
+            <div className="flex-1 text-center p-2 bg-secondary/10 rounded-lg border border-secondary/30">
+              <p className="text-xs text-muted-foreground mb-1">Máximo</p>
+              <p className="text-base sm:text-lg font-bold text-secondary">
+                {formatPrice(priceRange[1])}
+              </p>
+            </div>
           </div>
         </div>
       </div>
