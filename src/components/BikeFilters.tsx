@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Search, DollarSign } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
 
 interface BikeFiltersProps {
   searchTerm: string;
@@ -19,6 +20,30 @@ export const BikeFilters = ({
   priceRange,
   onPriceRangeChange,
 }: BikeFiltersProps) => {
+  const [minInput, setMinInput] = useState(priceRange[0].toString());
+  const [maxInput, setMaxInput] = useState(priceRange[1].toString());
+
+  useEffect(() => {
+    setMinInput(priceRange[0].toString());
+    setMaxInput(priceRange[1].toString());
+  }, [priceRange]);
+
+  const handleMinInputChange = (value: string) => {
+    setMinInput(value);
+    const numValue = parseInt(value.replace(/\D/g, "")) || 0;
+    if (numValue <= priceRange[1]) {
+      onPriceRangeChange([numValue, priceRange[1]]);
+    }
+  };
+
+  const handleMaxInputChange = (value: string) => {
+    setMaxInput(value);
+    const numValue = parseInt(value.replace(/\D/g, "")) || maxPrice;
+    if (numValue >= priceRange[0] && numValue <= maxPrice) {
+      onPriceRangeChange([priceRange[0], numValue]);
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -76,20 +101,32 @@ export const BikeFilters = ({
             />
           </div>
 
-          {/* Price Display - Mobile First */}
+          {/* Price Input - Mobile First */}
           <div className="flex items-center justify-between gap-3 px-2">
-            <div className="flex-1 text-center p-2 bg-primary/10 rounded-lg border border-primary/30">
-              <p className="text-xs text-muted-foreground mb-1">Mínimo</p>
-              <p className="text-base sm:text-lg font-bold text-primary">
-                {formatPrice(priceRange[0])}
-              </p>
+            <div className="flex-1">
+              <Label htmlFor="min-price" className="text-xs text-muted-foreground mb-1 block">
+                Mínimo
+              </Label>
+              <Input
+                id="min-price"
+                type="text"
+                value={formatPrice(parseInt(minInput) || 0)}
+                onChange={(e) => handleMinInputChange(e.target.value)}
+                className="h-10 text-center text-base font-bold border-primary/30 bg-primary/10 text-primary"
+              />
             </div>
-            <div className="text-muted-foreground text-sm">-</div>
-            <div className="flex-1 text-center p-2 bg-secondary/10 rounded-lg border border-secondary/30">
-              <p className="text-xs text-muted-foreground mb-1">Máximo</p>
-              <p className="text-base sm:text-lg font-bold text-secondary">
-                {formatPrice(priceRange[1])}
-              </p>
+            <div className="text-muted-foreground text-sm mt-5">-</div>
+            <div className="flex-1">
+              <Label htmlFor="max-price" className="text-xs text-muted-foreground mb-1 block">
+                Máximo
+              </Label>
+              <Input
+                id="max-price"
+                type="text"
+                value={formatPrice(parseInt(maxInput) || 0)}
+                onChange={(e) => handleMaxInputChange(e.target.value)}
+                className="h-10 text-center text-base font-bold border-secondary/30 bg-secondary/10 text-secondary"
+              />
             </div>
           </div>
         </div>

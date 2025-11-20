@@ -64,19 +64,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-accent">
-      {/* Header with Logo */}
-      <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-sm border-b border-border shadow-card-custom">
-        <div className="container mx-auto px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-center sm:justify-start">
-            <img 
-              src={logo} 
-              alt="Logo" 
-              className="h-12 sm:h-14 md:h-16 w-auto object-contain"
-            />
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto px-4 py-6 sm:py-8 md:py-12">
         {/* Logo Hero Section - Mobile First */}
         <section className="text-center mb-8 sm:mb-10 md:mb-12">
