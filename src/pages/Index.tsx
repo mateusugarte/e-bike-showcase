@@ -113,7 +113,6 @@ const Index = () => {
               <BikeCard
                 key={bike.id}
                 bike={bike}
-                onClick={() => setSelectedBike(bike)}
               />
             ))}
           </div>

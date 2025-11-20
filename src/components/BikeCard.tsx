@@ -1,13 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { Tables } from "@/integrations/supabase/types";
 import { Battery } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface BikeCardProps {
   bike: Tables<"Catálogo_bikes">;
-  onClick: () => void;
 }
 
-export const BikeCard = ({ bike, onClick }: BikeCardProps) => {
+export const BikeCard = ({ bike }: BikeCardProps) => {
+  const navigate = useNavigate();
   const primaryImage = bike.foto_1 || bike.foto_2 || bike.foto_3;
 
   const formatPrice = (price: string | null) => {
@@ -20,16 +21,16 @@ export const BikeCard = ({ bike, onClick }: BikeCardProps) => {
 
   return (
     <Card
-      onClick={onClick}
+      onClick={() => navigate(`/bike/${bike.id}`)}
       className="group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-elegant hover:-translate-y-1 active:scale-95 border-border/50"
     >
       {/* Image Container - Mobile Optimized */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative aspect-square overflow-hidden bg-muted">
         {primaryImage ? (
           <img
             src={primaryImage}
             alt={bike.modelo}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-110"
             loading="lazy"
           />
         ) : (
