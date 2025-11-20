@@ -31,12 +31,8 @@ const BikePage = () => {
   });
 
   const formatPrice = (price: string | null) => {
-    const numPrice = parsePrice(price);
-    if (!numPrice) return "Consulte";
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(numPrice);
+    if (!price) return "Consulte";
+    return `R$ ${price}`;
   };
 
   const images = [bike?.foto_1, bike?.foto_2, bike?.foto_3].filter(Boolean) as string[];
