@@ -1,12 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Tables } from "@/integrations/supabase/types";
-import { Battery, Gauge } from "lucide-react";
-
-type Bike = Tables<"Catálogo_bikes">;
+import { Battery } from "lucide-react";
 
 interface BikeCardProps {
-  bike: Bike;
+  bike: Tables<"Catálogo_bikes">;
   onClick: () => void;
 }
 
@@ -23,51 +20,68 @@ export const BikeCard = ({ bike, onClick }: BikeCardProps) => {
 
   return (
     <Card
-      className="group cursor-pointer overflow-hidden border-border hover:shadow-[var(--shadow-hover)] transition-all duration-300"
       onClick={onClick}
-      style={{ boxShadow: "var(--shadow-card)" }}
+      className="group cursor-pointer overflow-hidden transition-all duration-300 hover:shadow-elegant hover:-translate-y-1 active:scale-95 border-border/50"
     >
+      {/* Image Container - Mobile Optimized */}
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {primaryImage ? (
           <img
             src={primaryImage}
             alt={bike.modelo}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <Battery className="h-16 w-16 text-muted-foreground/20" />
+            <p className="text-sm text-muted-foreground">Sem imagem</p>
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        
+        {/* Hover Action */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <span className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-elegant">
+            Ver Detalhes
+          </span>
+        </div>
       </div>
 
-      <CardContent className="p-4 space-y-3">
-        <div>
-          <h3 className="font-semibold text-lg text-card-foreground line-clamp-1">
-            {bike.modelo}
-          </h3>
-        </div>
+      {/* Content - Mobile First */}
+      <div className="p-4 sm:p-5">
+        {/* Model Name */}
+        <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-3 line-clamp-2 min-h-[3.5rem] sm:min-h-[3rem]">
+          {bike.modelo}
+        </h3>
 
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Battery className="h-4 w-4" />
-            <span>{bike.autonomia || "N/A"}</span>
-          </div>
-          {bike.aguenta && (
-            <Badge variant="secondary" className="text-xs">
-              <Gauge className="h-3 w-3 mr-1" />
-              {bike.aguenta}
-            </Badge>
+        {/* Info Grid */}
+        <div className="space-y-2.5 mb-4">
+          {/* Battery */}
+          {bike.autonomia && (
+            <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-primary/5 border border-primary/10">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <Battery className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-muted-foreground">Autonomia</p>
+                <p className="text-sm font-semibold text-card-foreground truncate">
+                  {bike.autonomia}
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
-        <div className="pt-2 border-t border-border">
-          <p className="text-2xl font-bold text-primary">
+        {/* Price - Prominent */}
+        <div className="pt-3 border-t border-border/50">
+          <p className="text-xs text-muted-foreground mb-1">Valor</p>
+          <p className="text-2xl sm:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             {formatPrice(bike.valor)}
           </p>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 };
