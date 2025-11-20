@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Tables } from "@/integrations/supabase/types";
 import { Battery } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { parsePrice } from "@/lib/utils";
 
 interface BikeCardProps {
   bike: Tables<"Catálogo_bikes">;
@@ -12,11 +13,12 @@ export const BikeCard = ({ bike }: BikeCardProps) => {
   const primaryImage = bike.foto_1 || bike.foto_2 || bike.foto_3;
 
   const formatPrice = (price: string | null) => {
-    if (!price) return "Consulte";
+    const numPrice = parsePrice(price);
+    if (!numPrice) return "Consulte";
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(parseFloat(price.replace(/[^\d,]/g, "").replace(",", ".")));
+    }).format(numPrice);
   };
 
   return (
